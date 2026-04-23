@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lumens HUB架構展示</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      color: #0f172a;
+      background: radial-gradient(circle at top, #dbeafe, #f8fafc 40%, #e2e8f0 100%);
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(255,255,255,0.85);
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+    }
+    .badge.secondary {
+      background: #eef2f7;
+      border: 1px solid #dbe1ea;
+      box-shadow: none;
+    }
+    .title {
+      font-size: clamp(2.2rem, 4vw, 3.6rem);
+      line-height: 1.1;
+      margin: 20px 0 0;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      color: #475569;
+      font-size: 18px;
+      line-height: 1.8;
+      max-width: 900px;
+      margin-top: 18px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 1.1fr 2fr;
+      gap: 24px;
+    }
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: rgba(255,255,255,0.88);
+      border-radius: 28px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.10);
+      border: 1px solid rgba(255,255,255,0.65);
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 28px 28px 0;
+    }
+    .card-body {
+      padding: 24px 28px 28px;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .icon-box {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      background: #0f172a;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+    .card-title {
+      font-size: 30px;
+      margin: 0;
+      font-weight: 700;
+    }
+    .card-subtitle, .muted {
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.7;
+      margin-top: 8px;
+    }
+    .btn, .btn-link {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      min-height: 46px;
+      border-radius: 18px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: #0f172a;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      padding: 0 16px;
+    }
+    .btn:hover, .btn-link:hover {
+      border-color: #0f172a;
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+      transform: translateY(-1px);
+    }
+    .btn-primary {
+      background: #0f172a;
+      color: #fff;
+      border-color: #0f172a;
+    }
+    .btn-outline {
+      background: rgba(255,255,255,0.86);
+    }
+    .provider-btn, .user-btn {
+      width: 100%;
+      text-align: left;
+      padding: 18px 20px;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .provider-btn:hover, .user-btn:hover {
+      border-color: #0f172a;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+    }
+    .user-btn .name {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .user-btn .role {
+      color: #64748b;
+      font-size: 14px;
+      margin-top: 6px;
+    }
+    .user-btn .modules {
+      color: #64748b;
+      font-size: 12px;
+      margin-top: 12px;
+    }
+    .section-space { margin-top: 32px; }
+    .pill-wrap {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .pill {
+      display: inline-flex;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .summary-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 18px;
+    }
+    .separator {
+      border: 0;
+      border-top: 1px solid #e2e8f0;
+      margin: 6px 0;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .switch {
+      position: relative;
+      width: 54px;
+      height: 30px;
+      display: inline-block;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #cbd5e1;
+      border-radius: 999px;
+      transition: .2s;
+      cursor: pointer;
+    }
+    .slider:before {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      left: 4px;
+      top: 4px;
+      border-radius: 50%;
+      background: #fff;
+      transition: .2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+    .switch input:checked + .slider {
+      background: #0f172a;
+    }
+    .switch input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+    .switch input:disabled + .slider {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .module-card .card-title-small {
+      font-size: 22px;
+      margin: 0;
+    }
+    .module-meta {
+      color: #475569;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .module-panel {
+      background: #0f172a;
+      color: #fff;
+      border-radius: 28px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
+      overflow: hidden;
+    }
+    .module-panel .card-header, .module-panel .card-body { padding-left: 28px; padding-right: 28px; }
+    .module-dark-box {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 18px;
+      color: #cbd5e1;
+      line-height: 1.8;
+    }
+    .module-dark-box strong { color: #fff; }
+    .edit-box {
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid rgba(52, 211, 153, 0.28);
+      color: #d1fae5;
+    }
+    .tabs {
+      margin-top: 40px;
+    }
+    .tab-list {
+      display: inline-grid;
+      grid-template-columns: repeat(3, 1fr);
+      width: min(100%, 520px);
+      background: rgba(255,255,255,0.86);
+      border: 1px solid rgba(255,255,255,0.8);
+      border-radius: 18px;
+      padding: 4px;
+      gap: 4px;
+    }
+    .tab-btn {
+      min-height: 42px;
+      border: 0;
+      background: transparent;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #334155;
+    }
+    .tab-btn.active {
+      background: #0f172a;
+      color: #fff;
+    }
+    .tab-panel { display: none; margin-top: 16px; }
+    .tab-panel.active { display: block; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      padding: 14px 6px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    th { font-size: 13px; color: #475569; }
+    .hidden { display: none !important; }
+    @media (max-width: 1080px) {
+      .layout, .module-grid, .grid-2, .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 640px) {
+      .container { padding: 24px 16px; }
+      .card-header { padding: 22px 20px 0; }
+      .card-body { padding: 20px; }
+      .title { font-size: 2rem; }
+      .subtitle { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section id="home-view">
+      <div style="margin-bottom: 40px;">
+        <div class="badge">✨ <span>Lumens HUB架構展示</span></div>
+        <h1 class="title">Lumens HUB主頁</h1>
+        <p class="subtitle">一個 Lumens HUB 主頁，兩個登入入口：Global Access 與 China Access。登入後依角色顯示不同模組，管理員可啟用編輯模式。</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="row" style="justify-content:flex-start; align-items:flex-start; gap:14px; flex-wrap:nowrap;">
+              <div class="icon-box">🌐</div>
+              <div>
+                <h2 class="card-title">Global Access</h2>
+                <div class="card-subtitle">For global team, partners, and international users</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body stack">
+            <button class="provider-btn" data-access="global" data-provider="google">
+              <div style="font-weight:700;">使用 Google SSO 登入</div>
+              <div class="muted">Demo flow only</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="row" style="justify-content:flex-start; align-items:flex-start; gap:14px; flex-wrap:nowrap;">
+              <div class="icon-box">🏢</div>
+              <div>
+                <h2 class="card-title">China Access</h2>
+                <div class="card-subtitle">For LCG, China users, and region-specific platforms</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body stack">
+            <button class="provider-btn" data-access="cn" data-provider="wechat">
+              <div style="font-weight:700;">使用微信 SSO 登入</div>
+              <div class="muted">Demo flow only</div>
+            </button>
+            <button class="provider-btn" data-access="cn" data-provider="telegram">
+              <div style="font-weight:700;">使用 Telegram SSO 登入</div>
+              <div class="muted">Demo flow only</div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="login-view" class="hidden">
+      <div class="row" style="margin-bottom: 32px; align-items:flex-start;">
+        <div>
+          <div class="pill-wrap" id="login-badges"></div>
+          <h1 class="title">模擬 SSO 登入頁</h1>
+          <p class="subtitle">請選擇示範帳號，進入登入後的 Lumens HUB 模組頁面。</p>
+        </div>
+        <button class="btn btn-outline" id="back-home-btn" style="width:auto;">回到主頁</button>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <div class="grid-3" id="user-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="dashboard-view" class="hidden">
+      <div class="row" style="margin-bottom: 32px; align-items:flex-start;">
+        <div>
+          <div class="pill-wrap" id="dashboard-badges"></div>
+          <h1 class="title" id="dashboard-title"></h1>
+          <p class="subtitle">這個頁面模擬使用者完成 SSO 登入後，依角色權限看到的 Lumens HUB 模組首頁。</p>
+        </div>
+        <div class="row" style="justify-content:flex-end; gap:12px;">
+          <div class="summary-box" style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:rgba(255,255,255,0.9);">
+            <div style="font-size:22px;">👤</div>
+            <div>
+              <div style="font-weight:700;" id="mini-user-name"></div>
+              <div class="muted" id="mini-user-role" style="margin-top:2px;"></div>
+            </div>
+          </div>
+          <button class="btn btn-outline" id="switch-user-btn" style="width:auto;">切換示範帳號</button>
+          <button class="btn btn-outline" id="logout-btn" style="width:auto;">登出</button>
+        </div>
+      </div>
+
+      <div class="layout">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title" style="font-size:30px;">🛡️ 權限摘要</h2>
+            <div class="card-subtitle">展示登入後的角色、網域與可用功能。</div>
+          </div>
+          <div class="card-body stack">
+            <div>
+              <div class="muted">帳號</div>
+              <div style="font-weight:700; font-size:20px; margin-top:4px;" id="summary-name"></div>
+            </div>
+            <div>
+              <div class="muted">角色</div>
+              <div style="font-weight:700; margin-top:4px;" id="summary-role"></div>
+            </div>
+            <div>
+              <div class="muted" style="margin-bottom:10px;">存取網域</div>
+              <div class="pill-wrap" id="summary-domains"></div>
+            </div>
+            <div>
+              <div class="muted" style="margin-bottom:10px;">可見模組</div>
+              <div class="pill-wrap" id="summary-modules"></div>
+            </div>
+            <hr class="separator" />
+            <div class="summary-box">
+              <div class="toggle-row">
+                <div>
+                  <div style="font-weight:700;">⚙️ 編輯模式</div>
+                  <div class="muted">僅管理員可切換，代表可進後台與編輯模組設定。</div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="edit-toggle" />
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="muted" id="edit-note" style="margin-top:14px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title" style="font-size:30px;">可見功能模組</h2>
+              <div class="card-subtitle">依登入帳號自動顯示授權模組。</div>
+            </div>
+            <div class="card-body">
+              <div class="module-grid" id="module-list"></div>
+            </div>
+          </div>
+
+          <div class="module-panel hidden" id="opened-module-panel">
+            <div class="card-header">
+              <h2 class="card-title" style="font-size:30px;" id="opened-module-title"></h2>
+              <div class="card-subtitle" style="color:#cbd5e1;">這是模組內容區塊的 Demo 畫面。</div>
+            </div>
+            <div class="card-body stack">
+              <div class="module-dark-box">
+                <strong>目前登入帳號：</strong><span id="opened-user-name"></span><br>
+                <strong>登入入口：</strong><span id="opened-provider"></span><br>
+                <strong>角色：</strong><span id="opened-user-role"></span>
+              </div>
+              <div class="module-dark-box" id="opened-module-mode"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tabs">
+      <div class="tab-list">
+        <button class="tab-btn active" data-tab="notes">架構說明</button>
+        <button class="tab-btn" data-tab="roles">角色矩陣</button>
+        <button class="tab-btn" data-tab="next">下一步</button>
+      </div>
+      <div class="tab-panel active" id="tab-notes">
+        <div class="card">
+          <div class="card-body" style="font-size:14px; line-height:1.9; color:#334155;">
+            這個 MVP 展示的是「Lumens HUB架構展示」：Global Access 與 China Access 代表不同 SSO 來源；每位使用者只對應一種登入方式，登入後再依角色顯示可見模組與編輯權限。這一版先用前端互動模擬流程，適合拿來驗證資訊架構、角色矩陣與模組入口邏輯。
+          </div>
+        </div>
+      </div>
+      <div class="tab-panel" id="tab-roles">
+        <div class="card">
+          <div class="card-body" style="overflow:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>帳號</th>
+                  <th>角色</th>
+                  <th>Access Domain</th>
+                  <th>可見模組</th>
+                  <th>後台編輯</th>
+                </tr>
+              </thead>
+              <tbody id="role-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="tab-panel" id="tab-next">
+        <div class="card">
+          <div class="card-body" style="font-size:14px; line-height:1.9; color:#334155;">
+            下一步可把這個 Demo 升級成：1. 真實 Google OIDC / 微信登入串接；2. 模組獨立頁面與後台管理；3. 權限資料改由後端 API 控制；4. 加入 Global / CN 導覽與品牌頁面。
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const USERS = {
+      admin: { id: "admin", name: "總管理員", role: "admin", accessDomain: ["global"], providers: ["google"], modules: [1, 2, 3, 4, 5, 6], canEdit: true },
+      joris: { id: "joris", name: "Joris", role: "LEI Sales VP", accessDomain: ["global"], providers: ["google"], modules: [1, 4, 6], canEdit: false },
+      nerb: { id: "nerb", name: "Nerb", role: "TS_member", accessDomain: ["global"], providers: ["google"], modules: [2, 3], canEdit: false },
+      jbanick: { id: "jbanick", name: "JB&A Nick", role: "Disty Sales", accessDomain: ["global"], providers: ["google"], modules: [3, 4, 5], canEdit: false },
+      chinaAdmin: { id: "chinaAdmin", name: "China 管理員", role: "cn_admin", accessDomain: ["cn"], providers: ["wechat"], modules: [4, 5], canEdit: true },
+      yt: { id: "yt", name: "YT", role: "cn_user", accessDomain: ["cn"], providers: ["wechat"], modules: [4, 5], canEdit: false },
+      keep: { id: "keep", name: "Keep", role: "telegram_user", accessDomain: ["cn"], providers: ["telegram"], modules: [4, 5], canEdit: false }
+    };
+
+    const MODULES = [
+      { id: 1, name: "學習彈藥庫", desc: "Sales enablement / dashboard demo", tag: "Global" },
+      { id: 2, name: "TS 工作群組", desc: "Shared workspace module", tag: "Shared" },
+      { id: 3, name: "技術認證中心", desc: "TS / certification related demo", tag: "CN / TS" },
+      { id: 4, name: "銷售認證中心", desc: "Admin-only or restricted operations", tag: "Admin" },
+      { id: 5, name: "VIP 客戶中心", desc: "Knowledge / academy / content demo", tag: "Global" },
+      { id: 6, name: "LEI Sales HUB", desc: "Knowledge / academy / content demo", tag: "Global", link: "https://sites.google.com/view/lumenslei" }
+    ];
+
+    const PROVIDERS = {
+      global: [{ id: "google", label: "使用 Google SSO 登入" }],
+      cn: [
+        { id: "wechat", label: "使用微信 SSO 登入" },
+        { id: "telegram", label: "使用 Telegram SSO 登入" }
+      ]
+    };
+
+    const state = {
+      accessType: null,
+      provider: null,
+      selectedUserKey: null,
+      editMode: false,
+      openedModule: null
+    };
+
+    const el = {
+      homeView: document.getElementById('home-view'),
+      loginView: document.getElementById('login-view'),
+      dashboardView: document.getElementById('dashboard-view'),
+      loginBadges: document.getElementById('login-badges'),
+      userList: document.getElementById('user-list'),
+      dashboardBadges: document.getElementById('dashboard-badges'),
+      dashboardTitle: document.getElementById('dashboard-title'),
+      miniUserName: document.getElementById('mini-user-name'),
+      miniUserRole: document.getElementById('mini-user-role'),
+      summaryName: document.getElementById('summary-name'),
+      summaryRole: document.getElementById('summary-role'),
+      summaryDomains: document.getElementById('summary-domains'),
+      summaryModules: document.getElementById('summary-modules'),
+      editToggle: document.getElementById('edit-toggle'),
+      editNote: document.getElementById('edit-note'),
+      moduleList: document.getElementById('module-list'),
+      openedModulePanel: document.getElementById('opened-module-panel'),
+      openedModuleTitle: document.getElementById('opened-module-title'),
+      openedUserName: document.getElementById('opened-user-name'),
+      openedProvider: document.getElementById('opened-provider'),
+      openedUserRole: document.getElementById('opened-user-role'),
+      openedModuleMode: document.getElementById('opened-module-mode'),
+      roleTableBody: document.getElementById('role-table-body')
+    };
+
+    function getSelectedUser() {
+      return state.selectedUserKey ? USERS[state.selectedUserKey] : null;
+    }
+
+    function getProviderLabel() {
+      if (!state.accessType || !state.provider) return '';
+      const target = PROVIDERS[state.accessType].find(p => p.id === state.provider);
+      return target ? target.label : state.provider;
+    }
+
+    function getVisibleUsers() {
+      if (!state.accessType || !state.provider) return [];
+      return Object.values(USERS).filter(u => u.accessDomain.includes(state.accessType) && u.providers.includes(state.provider));
+    }
+
+    function getVisibleModules() {
+      const user = getSelectedUser();
+      if (!user) return [];
+      return MODULES.filter(m => user.modules.includes(m.id));
+    }
+
+    function makeBadge(text, secondary = false) {
+      return `<span class="badge${secondary ? ' secondary' : ''}">${text}</span>`;
+    }
+
+    function renderLoginBadges() {
+      el.loginBadges.innerHTML = `${makeBadge(state.accessType === 'global' ? 'Global Access' : 'China Access')}${makeBadge(getProviderLabel(), true)}`;
+    }
+
+    function renderUserList() {
+      el.userList.innerHTML = getVisibleUsers().map(u => `
+        <button class="user-btn" data-user="${u.id}">
+          <div class="name">${u.name}</div>
+          <div class="role">role: ${u.role}</div>
+          <div class="modules">可見模組：${u.modules.join(', ')}</div>
+        </button>
+      `).join('');
+
+      el.userList.querySelectorAll('[data-user]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const userKey = btn.getAttribute('data-user');
+          state.selectedUserKey = userKey;
+          state.editMode = USERS[userKey].canEdit;
+          state.openedModule = null;
+          render();
+        });
+      });
+    }
+
+    function renderDashboard() {
+      const user = getSelectedUser();
+      const modules = getVisibleModules();
+      const providerLabel = getProviderLabel();
+      const domainLabel = state.accessType === 'global' ? 'Global Access' : 'China Access';
+
+      el.dashboardBadges.innerHTML = `${makeBadge('已登入')}${makeBadge(domainLabel, true)}${makeBadge(providerLabel, true)}`;
+      el.dashboardTitle.textContent = `${user.name} 的 Lumens HUB`;
+      el.miniUserName.textContent = user.name;
+      el.miniUserRole.textContent = `role: ${user.role}`;
+      el.summaryName.textContent = user.name;
+      el.summaryRole.textContent = user.role;
+      el.summaryDomains.innerHTML = user.accessDomain.map(d => `<span class="pill">${d}</span>`).join('');
+      el.summaryModules.innerHTML = modules.map(m => `<span class="pill">${m.name}</span>`).join('');
+
+      el.editToggle.checked = state.editMode;
+      el.editToggle.disabled = !user.canEdit;
+      el.editNote.textContent = user.canEdit ? '目前帳號可使用後台編輯模式' : '目前帳號沒有後台編輯權限';
+
+      el.moduleList.innerHTML = modules.map(m => {
+        const action = m.id === 6
+          ? `<a class="btn-link btn-primary" href="${m.link}" target="_blank" rel="noopener noreferrer">進入</a>`
+          : `<button class="btn btn-primary module-open-btn" data-module="${m.id}">進入</button>`;
+
+        return `
+          <div class="card module-card">
+            <div class="card-header">
+              <div class="row" style="align-items:flex-start;">
+                <div>
+                  <h3 class="card-title-small">${m.name}</h3>
+                  <div class="card-subtitle">${m.desc}</div>
+                </div>
+                <span class="pill">${m.tag}</span>
+              </div>
+            </div>
+            <div class="card-body stack">
+              <div class="module-meta">▦ <span>可存取模組示意卡</span></div>
+              ${state.editMode ? `<div class="module-meta" style="color:#047857;">✎ <span>管理員可進入編輯模式</span></div>` : ''}
+              ${action}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      el.moduleList.querySelectorAll('.module-open-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const moduleId = Number(btn.getAttribute('data-module'));
+          state.openedModule = MODULES.find(m => m.id === moduleId) || null;
+          renderOpenedModule();
+        });
+      });
+
+      renderOpenedModule();
+    }
+
+    function renderOpenedModule() {
+      const user = getSelectedUser();
+      if (!state.openedModule || !user) {
+        el.openedModulePanel.classList.add('hidden');
+        return;
+      }
+
+      el.openedModulePanel.classList.remove('hidden');
+      el.openedModuleTitle.textContent = state.openedModule.name;
+      el.openedUserName.textContent = user.name;
+      el.openedProvider.textContent = `${state.accessType === 'global' ? 'Global Access' : 'China Access'} / ${getProviderLabel()}`;
+      el.openedUserRole.textContent = user.role;
+
+      if (state.editMode) {
+        el.openedModuleMode.className = 'module-dark-box edit-box';
+        el.openedModuleMode.innerHTML = `<strong>後台編輯模式已啟用</strong><br>這裡可延伸成：模組設定、內容發布、角色授權、資料管理。`;
+      } else {
+        el.openedModuleMode.className = 'module-dark-box';
+        el.openedModuleMode.innerHTML = `<strong>一般使用模式</strong><br>這裡可延伸成：模組首頁、查詢頁、課程入口、認證結果、票務系統等。`;
+      }
+    }
+
+    function renderRoleTable() {
+      el.roleTableBody.innerHTML = Object.values(USERS).map(u => `
+        <tr>
+          <td>${u.name}</td>
+          <td>${u.role}</td>
+          <td>${u.accessDomain.join(', ')}</td>
+          <td>${u.modules.join(', ')}</td>
+          <td>${u.canEdit ? 'Yes' : 'No'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function render() {
+      const isLoggedIn = !!getSelectedUser();
+      el.homeView.classList.toggle('hidden', !!state.accessType);
+      el.loginView.classList.toggle('hidden', !state.accessType || isLoggedIn);
+      el.dashboardView.classList.toggle('hidden', !isLoggedIn);
+
+      if (state.accessType && !isLoggedIn) {
+        renderLoginBadges();
+        renderUserList();
+      }
+
+      if (isLoggedIn) {
+        renderDashboard();
+      }
+    }
+
+    document.querySelectorAll('.provider-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.accessType = btn.getAttribute('data-access');
+        state.provider = btn.getAttribute('data-provider');
+        state.selectedUserKey = null;
+        state.editMode = false;
+        state.openedModule = null;
+        render();
+      });
+    });
+
+    document.getElementById('back-home-btn').addEventListener('click', () => {
+      state.accessType = null;
+      state.provider = null;
+      state.selectedUserKey = null;
+      state.editMode = false;
+      state.openedModule = null;
+      render();
+    });
+
+    document.getElementById('switch-user-btn').addEventListener('click', () => {
+      state.selectedUserKey = null;
+      state.editMode = false;
+      state.openedModule = null;
+      render();
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      state.accessType = null;
+      state.provider = null;
+      state.selectedUserKey = null;
+      state.editMode = false;
+      state.openedModule = null;
+      render();
+    });
+
+    el.editToggle.addEventListener('change', () => {
+      const user = getSelectedUser();
+      if (!user || !user.canEdit) {
+        el.editToggle.checked = false;
+        return;
+      }
+      state.editMode = el.editToggle.checked;
+      renderDashboard();
+    });
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-tab');
+        document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+        document.getElementById(`tab-${target}`).classList.add('active');
+      });
+    });
+
+    renderRoleTable();
+    render();
+  </script>
+</body>
+</html>
